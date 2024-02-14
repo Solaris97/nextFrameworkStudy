@@ -19,6 +19,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     //POST Method로 form Data 받음
     if (req.method == 'POST') {
         //정상 처리시 201 / 에러 발생시 400
+        if (req.body.title == "" ||
+            req.body.title == undefined ||
+            req.body.title == null) {
+            res.status(400).json({ message: "Title Error" })
+        } else if (req.body.content == "" ||
+            req.body.content == undefined ||
+            req.body.content == null) {
+            res.status(400).json({ message: "content Error" })
+
+        }
         try {
             await db.collection('post').insertOne({
                 title: req.body.title,
@@ -27,7 +37,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         } catch {
             res.status(400).json({ message: "insert Error" })
         }
-        res.status(201).json({ message: "insert Completed" })
+        // res.status(201).json({ message: "insert Completed" })
+        res.redirect(302, '/list');
     }
 }
 
