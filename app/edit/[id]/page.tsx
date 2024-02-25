@@ -3,17 +3,17 @@ import type { NextPage } from "next";
 import { connectDB } from "../../utils/database.tsx";
 
 import { Db, Document, ObjectId } from "mongodb";
-import { useEffect } from "react";
 
 //인터페이스 정의
-interface DetailPageProps {
+interface EditPageProps {
   params: Params;
 }
 
 interface Params {
   id: string;
 }
-const DetailPage: NextPage<DetailPageProps> = async ({
+
+const EditPage: NextPage<EditPageProps> = async ({
   params,
 }: {
   params: { id: string };
@@ -21,7 +21,7 @@ const DetailPage: NextPage<DetailPageProps> = async ({
   const client = await connectDB;
 
   //조회된 결과 값을 불러오는 Document Type 변수 선언
-  let detail!: Document;
+  let edit!: Document;
 
   //forum DB 연결
   const db: Db = client.db("forum");
@@ -37,7 +37,7 @@ const DetailPage: NextPage<DetailPageProps> = async ({
     ) {
       console.log("data missing");
     } else {
-      detail = await db
+      edit = await db
         .collection("post")
         .findOne({ _id: new ObjectId(params.id) });
     }
@@ -47,12 +47,25 @@ const DetailPage: NextPage<DetailPageProps> = async ({
   }
 
   return (
-    <div>
-      <h4>상세페이지</h4>
-      <h4>{detail.title}</h4>
-      <p>{detail.content}</p>
+    <div className="flex flex-col justify-center items-center h-[1200px] w-full">
+      <h4>수정페이지</h4>
+      <h4>{edit.title}</h4>
+      <form
+        action="/api/edit"
+        method="POST"
+        className="flex flex-col justify-center items-center h-[600px] w-[500px]"
+      >
+        <input type="hidden" name="_id" value={edit._id.toString()} />
+        <input
+          name="content"
+          placeholder="내용"
+          className="w-full h-[400px] border"
+          defaultValue={edit.content}
+        />
+        <button type="submit"> 전송</button>
+      </form>
     </div>
   );
 };
 
-export default DetailPage;
+export default EditPage;
